@@ -208,15 +208,19 @@ public static class Methods
         return result;
     }
 
-    public static bool PeekNamedPipe(IntPtr hPipe)
+    public static bool PeekNamedPipe(IntPtr hPipe, ref uint nbBytesAvailable)
     {
-        object[] parameters = { hPipe, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, (uint)0, IntPtr.Zero };
-        
-        return (bool)Generic.DynamicApiInvoke(
+        object[] parameters = { hPipe, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, nbBytesAvailable, IntPtr.Zero };
+
+        var result = (bool)Generic.DynamicApiInvoke(
             "kernel32.dll",
             "PeekNamedPipe",
             typeof(PeekNamedPipe),
             ref parameters);
+
+        nbBytesAvailable = (uint)parameters[4];
+
+        return result;
     }
 
     public static bool FreeLibrary(IntPtr hModule)

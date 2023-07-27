@@ -50,7 +50,12 @@ public static class Extensions
     public static bool DataAvailable(this PipeStream pipe)
     {
         var hPipe = pipe.SafePipeHandle.DangerousGetHandle();
-        return Interop.Methods.PeekNamedPipe(hPipe);
+        uint nbBytesAvailable = 0;
+        bool result = Interop.Methods.PeekNamedPipe(hPipe, ref nbBytesAvailable);
+        if (result == false)
+            throw new System.ComponentModel.Win32Exception("Named Pipe is not available.");
+
+        return nbBytesAvailable > 0;
     }
 
     public static async Task<byte[]> ReadStream(this Stream stream)
